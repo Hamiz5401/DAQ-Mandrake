@@ -1,0 +1,178 @@
+openapi: 3.0.0
+info:
+  title: Mandrake API
+  description:
+    This API provides data from Mandrake group which is from our sensors and Openweather API.
+  version: 1.0.0
+servers:
+- url: /mandrake-api/
+paths:
+  /sensors:
+    get:
+      summary: Return collection of the sensors table.
+      operationId: controller.get_sensors
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sensors'
+  /sensors/sensors_data/{date}:
+    parameters:
+    - name: date
+      in: path
+      required: true
+      schema:
+        type : string
+    get:
+      summary: Return a history of that specific date.
+      operationId: controller.get_sensors_by_date
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sensors'
+  /sensors/humidity_status:
+    get:
+      summary: Return latest entry of humidity and its status.
+      operationId: controller.get_humidity_status
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HumidityStatus'
+  /sensors/soil_status:
+    get:
+      summary: Return latest entry of soil and its status.
+      operationId: controller.get_soil_status
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SoilStatus'
+  /weather_data/forecast/{date}:
+    parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Return collection of forecast in a specific date with the latest time_get.
+      operationId: controller.get_forecast_by_date
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/API'
+  /weather_data/forecast/different_from_sensors:
+    get:
+      summary: Return a comparison table between API data and our sensors.
+      operationId: controller.get_comparison_of_api_and_sensors
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/APIDiff'
+
+components:
+  schemas:
+    Sensors:
+      type: object
+      properties:
+        basinId:
+          type: integer
+        name:
+          type: string
+        id:
+          type: integer
+        datetime:
+          type: string
+        soil:
+          type: integer
+        humidity:
+          type: integer
+        temperature:
+          type: integer
+        light:
+          type: integer
+        soil_status:
+          type: string
+        air_status:
+          type: string
+    HumidityStatus:
+      type: object
+      properties:
+        humidity:
+          type: integer
+        air_status:
+          type: string
+    SoilStatus:
+      type: object
+      properties:
+        soil:
+          type: integer
+        soil_status:
+          type: string
+    API:
+      type: object
+      properties:
+        id:
+          type: integer
+        main:
+          type: string
+        weather:
+          type: string
+        temp:
+          type: number
+        humidity:
+          type: integer
+        cloud:
+          type: integer
+        ts:
+          type: string
+        rain:
+          type: number
+          nullable: true
+        time_get:
+          type: string
+    APIDiff:
+      type: object
+      properties:
+        rounded_sensor_datetime:
+          type: string
+        weather_data_timestamp:
+          type: string
+        avg_sensor_temp:
+          type: number
+        avg_sensor_humidity:
+          type: number
+        api_temp:
+          type: number
+        api_humidity:
+          type: integer
+        latest_api_update:
+          type: string
