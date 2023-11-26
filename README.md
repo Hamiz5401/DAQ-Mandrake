@@ -1,5 +1,5 @@
-Mandrake API 
-===============
+#Mandrake API 
+
 ##Overview
 
 This documentation outlines the endpoints, operations, and data formats supported by the API.
@@ -10,7 +10,7 @@ This documentation outlines the endpoints, operations, and data formats supporte
 
 API endpoints example
 
-- /sensors
+- `/sensors`
   
   Return collection of the sensors table.
     ```json
@@ -28,7 +28,7 @@ API endpoints example
     ]
     ```
   
-- /sensors/sensors_data/{date}
+- `/sensors/sensors_data/{date}`
   * Date format **can only be** "year-month-day"
   * Example "2023-11-26"
   
@@ -48,7 +48,7 @@ API endpoints example
     ]
     ```
   
-- /sensors/humidity_status
+- `/sensors/humidity_status`
 
   Return latest entry of humidity and its status.
 
@@ -61,7 +61,7 @@ API endpoints example
   ]
   ```
   
-- /sensors/soil_status
+- `/sensors/soil_status`
 
   Return latest entry of soil and its status.
 
@@ -74,7 +74,7 @@ API endpoints example
   ]
   ```
   
-- /weather_data/forecast/{date}
+- `/weather_data/forecast/{date}`
   * Date format **can only be** "year-month-day"
   * Example "2023-11-26"
 
@@ -106,7 +106,7 @@ API endpoints example
   ]
   ```
   
-- /weather_data/forecast/different_from_sensors
+- `/weather_data/forecast/different_from_sensors`
 
   Return a comparison table between API data and our sensors.
 
