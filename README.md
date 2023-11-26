@@ -117,10 +117,10 @@ API endpoints example
       "api_temp": 26.52,
       "avg_sensor_humidity": 50,
       "avg_sensor_temp": 28,
-      "humidity_difference": 1.48,
-      "latest_api_update": 19,
+      "humidity_difference": 19,
+      "latest_api_update": "2023-11-26T06:00:05Z",
       "rounded_sensor_datetime": "2023-11-26 18:00:00",
-      "temp_difference": "2023-11-26T06:00:05Z",
+      "temp_difference": 1.48,
       "weather_data_timestamp": "2023-11-26T18:00:00Z"
     }
   ]

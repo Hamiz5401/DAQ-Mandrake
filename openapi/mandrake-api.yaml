@@ -103,10 +103,6 @@ components:
     Sensors:
       type: object
       properties:
-        basinId:
-          type: integer
-        name:
-          type: string
         id:
           type: integer
         datetime:

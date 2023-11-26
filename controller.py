@@ -136,17 +136,7 @@ def get_comparison_of_api_and_sensors():
             JOIN weather_data w ON m.rounded_sensor_datetime = w.ts
             GROUP BY m.rounded_sensor_datetime
             """)
-        result = [models.APIDiff(rounded_sensor_datetime, weather_data_timestamp, avg_sensor_temp,
-                                 avg_sensor_humidity, api_temp, api_humidity, temp_difference, humidity_difference,
-                                 latest_api_update)
-                  for rounded_sensor_datetime,
-                      weather_data_timestamp,
-                      avg_sensor_temp,
-                      avg_sensor_humidity,
-                      api_temp,
-                      api_humidity,
-                      temp_difference,
-                      humidity_difference,
-                      latest_api_update
-                  in cs.fetchall()]
+        data = list(cs.fetchall())
+        result = [models.APIDiff(data[0][0], data[0][1], data[0][2], data[0][3], data[0][4], data[0][5], data[0][7],
+                                 data[0][8], data[0][6])]
     return result
