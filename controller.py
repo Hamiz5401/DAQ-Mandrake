@@ -101,7 +101,21 @@ def get_comparison_of_api_and_sensors():
                     FROM weather_data w_max
                     WHERE w_max.time_get = MAX(w.time_get) and w_max.ts = m.rounded_sensor_datetime 
                 ) AS api_humidity,
-                MAX(w.time_get) AS latest_api_update
+                MAX(w.time_get) AS latest_api_update,
+                ABS(ROUND((
+                    (
+                        SELECT temp
+                        FROM weather_data w_max
+                        WHERE w_max.time_get = MAX(w.time_get) and w_max.ts = m.rounded_sensor_datetime
+                    ) - AVG(m.mandrake_temp)
+                ), 2)) AS temp_difference,
+                ABS(ROUND((
+                    (
+                        SELECT humidity
+                        FROM weather_data w_max
+                        WHERE w_max.time_get = MAX(w.time_get) and w_max.ts = m.rounded_sensor_datetime
+                    ) - AVG(m.mandrake_humidity)
+                ), 2)) AS humidity_difference
             FROM (
                 SELECT
                     id AS mandrake_id,
@@ -123,13 +137,16 @@ def get_comparison_of_api_and_sensors():
             GROUP BY m.rounded_sensor_datetime
             """)
         result = [models.APIDiff(rounded_sensor_datetime, weather_data_timestamp, avg_sensor_temp,
-                                      avg_sensor_humidity, api_temp, api_humidity, latest_api_update)
+                                 avg_sensor_humidity, api_temp, api_humidity, temp_difference, humidity_difference,
+                                 latest_api_update)
                   for rounded_sensor_datetime,
                       weather_data_timestamp,
                       avg_sensor_temp,
                       avg_sensor_humidity,
                       api_temp,
                       api_humidity,
+                      temp_difference,
+                      humidity_difference,
                       latest_api_update
                   in cs.fetchall()]
     return result

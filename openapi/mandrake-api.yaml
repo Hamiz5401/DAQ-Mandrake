@@ -174,5 +174,9 @@ components:
           type: number
         api_humidity:
           type: integer
+        temp_difference:
+          type: integer
+        humidity_difference:
+          type: integer
         latest_api_update:
           type: string
