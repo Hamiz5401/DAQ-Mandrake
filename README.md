@@ -1,6 +1,6 @@
-#Mandrake API 
+# Mandrake API 
 
-##Overview
+## Overview
 
 This documentation outlines the endpoints, operations, and data formats supported by the API.
 
