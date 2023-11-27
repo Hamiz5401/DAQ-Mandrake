@@ -20,8 +20,8 @@ def get_sensors():
     with pool.connection() as conn, conn.cursor() as cs:
         cs.execute("SELECT * FROM sensor_data")
         result = [models.Sensors(id, datetime, soil, humidity, temperature, light, soil_status,
-                                    air_status) for id, datetime, soil, humidity, temperature, light, soil_status,
-                                                    air_status in cs.fetchall()]
+                                 air_status) for id, datetime, soil, humidity, temperature, light, soil_status,
+                                                 air_status in cs.fetchall()]
     return result
 
 
@@ -33,8 +33,8 @@ def get_sensors_by_date(date):
             WHERE datetime >= %s AND datetime <= %s
             """, (f"{date}T00:00:00.000", f"{date}T23:59:59.000"))
         result = [models.Sensors(id, datetime, soil, humidity, temperature, light, soil_status,
-                                    air_status) for id, datetime, soil, humidity, temperature, light, soil_status,
-                                                    air_status in cs.fetchall()]
+                                 air_status) for id, datetime, soil, humidity, temperature, light, soil_status,
+                                                 air_status in cs.fetchall()]
         if not result:
             return "No sensor data on that date"
     return result
@@ -91,31 +91,11 @@ def get_comparison_of_api_and_sensors():
                 w.ts as weather_data_timestamp,
                 AVG(m.mandrake_temp) AS avg_sensor_temp,
                 AVG(m.mandrake_humidity) AS avg_sensor_humidity,
-                (
-                    SELECT temp
-                    FROM weather_data w_max
-                    WHERE w_max.time_get = MAX(w.time_get) and w_max.ts = m.rounded_sensor_datetime
-                ) AS api_temp,
-                (
-                    SELECT humidity
-                    FROM weather_data w_max
-                    WHERE w_max.time_get = MAX(w.time_get) and w_max.ts = m.rounded_sensor_datetime 
-                ) AS api_humidity,
-                MAX(w.time_get) AS latest_api_update,
-                ABS(ROUND((
-                    (
-                        SELECT temp
-                        FROM weather_data w_max
-                        WHERE w_max.time_get = MAX(w.time_get) and w_max.ts = m.rounded_sensor_datetime
-                    ) - AVG(m.mandrake_temp)
-                ), 2)) AS temp_difference,
-                ABS(ROUND((
-                    (
-                        SELECT humidity
-                        FROM weather_data w_max
-                        WHERE w_max.time_get = MAX(w.time_get) and w_max.ts = m.rounded_sensor_datetime
-                    ) - AVG(m.mandrake_humidity)
-                ), 2)) AS humidity_difference
+                w.temp,
+                w.humidity,
+                w.time_get AS latest_api_update,
+                ABS(ROUND(w.temp - AVG(m.mandrake_temp), 2)) AS temp_difference,
+                ABS(ROUND(w.humidity - AVG(m.mandrake_humidity), 2)) AS humidity_difference
             FROM (
                 SELECT
                     id AS mandrake_id,
@@ -133,10 +113,32 @@ def get_comparison_of_api_and_sensors():
                     humidity AS mandrake_humidity
                 FROM sensor_data
             ) m
-            JOIN weather_data w ON m.rounded_sensor_datetime = w.ts
-            GROUP BY m.rounded_sensor_datetime
+            JOIN (
+                SELECT
+                    ts,
+                    temp,
+                    humidity,
+                    time_get
+                FROM weather_data w1
+                WHERE time_get = (
+                    SELECT MAX(time_get)
+                    FROM weather_data w2
+                    WHERE w1.ts = w2.ts
+                )
+            ) w ON m.rounded_sensor_datetime = w.ts
+            GROUP BY m.rounded_sensor_datetime, w.temp, w.humidity, w.time_get
             """)
-        data = list(cs.fetchall())
-        result = [models.APIDiff(data[0][0], data[0][1], data[0][2], data[0][3], data[0][4], data[0][5], data[0][7],
-                                 data[0][8], data[0][6])]
+        result = [models.APIDiff(rounded_sensor_datetime, weather_data_timestamp, avg_sensor_temp,
+                                 avg_sensor_humidity, api_temp, api_humidity, temp_difference, humidity_difference,
+                                 latest_api_update)
+                  for rounded_sensor_datetime,
+                      weather_data_timestamp,
+                      avg_sensor_temp,
+                      avg_sensor_humidity,
+                      api_temp,
+                      api_humidity,
+                      latest_api_update,
+                      temp_difference,
+                      humidity_difference
+                  in cs.fetchall()]
     return result
