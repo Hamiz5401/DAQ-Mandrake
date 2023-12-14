@@ -5,7 +5,7 @@ info:
     This API provides data from Mandrake group which is from our sensors and Openweather API.
   version: 1.0.0
 servers:
-- url: /mandrake-api/
+- url: http://127.0.0.1:8080/mandrake-api
 paths:
   /sensors:
     get:
