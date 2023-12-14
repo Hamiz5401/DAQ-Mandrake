@@ -94,8 +94,8 @@ def get_comparison_of_api_and_sensors():
                 w.temp,
                 w.humidity,
                 w.time_get AS latest_api_update,
-                ABS(ROUND(w.temp - AVG(m.mandrake_temp), 2)) AS temp_difference,
-                ABS(ROUND(w.humidity - AVG(m.mandrake_humidity), 2)) AS humidity_difference
+                ROUND(w.temp - AVG(m.mandrake_temp), 2) AS temp_difference,
+                ROUND(w.humidity - AVG(m.mandrake_humidity), 2) AS humidity_difference
             FROM (
                 SELECT
                     id AS mandrake_id,
